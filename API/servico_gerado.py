@@ -1,42 +1,45 @@
 ```python
 import csv
 
-def calculate_column_average(file_path, column_name):
-    # Initialize a list to store the values from the specified column
-    values = []
+def calculate_average_from_csv(file_path, column_name):
+    # Initialize a list to store values from the specified column
+    column_values = []
 
-    # Open the CSV file for reading
-    with open(file_path, mode='r', newline='') as csvfile:
+    # Open the CSV file
+    with open(file_path, mode='r', newline='') as file:
         # Create a CSV reader object
-        csvreader = csv.DictReader(csvfile)
+        csv_reader = csv.DictReader(file)
+        
+        # Read each row in the CSV file
+        for row in csv_reader:
+            # Check if the column_name exists in the row (to handle potential bad data)
+            if column_name in row:
+                # Attempt to convert the column value to a float and add to the column_values list
+                try:
+                    value = float(row[column_name])
+                    column_values.append(value)
+                except ValueError:
+                    # Skip values that cannot be converted to float (e.g., non-numeric strings)
+                    continue
 
-        # Iterate over each row in the CSV file
-        for row in csvreader:
-            try:
-                # Convert the value in the specified column to a float and append to the list
-                value = float(row[column_name])
-                values.append(value)
-            except ValueError:
-                # If conversion fails, print a warning and skip the value
-                print(f"Warning: Could not convert value '{row[column_name]}' to float. Skipping.")
-
-    # Calculate the average if there are any valid values collected
-    if values:
-        average = sum(values) / len(values)
+    # Calculate the average if we have any valid values
+    if column_values:
+        # Sum all the values and divide by the number of elements to get the average
+        average = sum(column_values) / len(column_values)
+        return average
     else:
-        average = 0
-        print(f"No valid numerical data found in column '{column_name}'.")
+        # Return None if there are no valid values to avoid division by zero
+        return None
 
-    return average
+# Example usage:
+file_path = 'data.csv'  # Specify your CSV file path here
+column_name = 'column_of_interest'  # Specify the column name you wish to average
 
-# Specify the path to the CSV file
-file_path = 'data.csv'  # Change this to your CSV file path
-# Specify the column name whose average you want to compute
-column_name = 'column_name'  # Change this to the name of your target column
+average = calculate_average_from_csv(file_path, column_name)
+if average is not None:
+    print(f"The average of the '{column_name}' column is: {average}")
+else:
+    print(f"No valid data found in the '{column_name}' column.")
+``` 
 
-# Call the function and print the result
-average = calculate_column_average(file_path, column_name)
-print(f"The average of column '{column_name}' is: {average}")
-```
-
-This Python script reads a CSV file and calculates the average of the specified column. It uses the `csv` module to handle CSV files and `float` conversion to ensure numerical calculations. If non-numeric data is encountered in the column, it skips those entries and issues a warning. The result is printed at the end, showing the average of the column's numeric data. Remember to modify `file_path` and `column_name` to fit your needs.
+This script reads through a CSV file, retrieves numeric data from a specified column, and calculates the average of that data, handling cases where some values might not be numbers.
