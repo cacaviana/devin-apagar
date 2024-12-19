@@ -1,1 +1,44 @@
-{"code":"import csv\n\n# Função para calcular a média de uma coluna específica em um arquivo CSV\ndef calcular_media_csv(nome_arquivo, nome_coluna):\n    # Inicializa as variáveis para somar os valores e contar quantos existem\n    soma = 0\n    contador = 0\n    \n    # Abre o arquivo CSV para leitura\n    with open(nome_arquivo, newline='') as csvfile:\n        # Cria um leitor CSV\n        leitor = csv.DictReader(csvfile)\n        \n        # Itera sobre cada linha do CSV\n        for row in leitor:\n            try:\n                # Tenta converter o valor da coluna especificada para um float\n                valor = float(row[nome_coluna])\n                \n                # Adiciona o valor à soma\n                soma += valor\n                \n                # Incrementa o contador\n                contador += 1\n            except ValueError:\n                # Se o valor não puder ser convertido para float, ignora esta linha\n                continue\n    \n    # Calcula a média se houver valores (contador > 0)\n    if contador > 0:\n        return soma / contador\n    else:\n        # Retorna None se não houver valores válidos para calcular a média\n        return None\n\n# Exemplo de uso: calcular a média da coluna 'preco' no arquivo 'produtos.csv'\nmedia = calcular_media_csv('produtos.csv', 'preco')\nprint(f'A média da coluna preco é: {media}')"}
+# Import the necessary library for handling CSV files
+import csv
+
+# Define the function to read the CSV file and calculate the mean of the specified column
+def calculate_column_mean(file_path, column_name):
+    try:
+        # Open the CSV file in read mode
+        with open(file_path, mode='r') as file:
+            # Create a CSV reader object to iterate over lines in the file
+            csv_reader = csv.DictReader(file)
+            
+            # Initialize a list to store the values of the specified column
+            column_values = []
+
+            # Iterate over each row in the CSV
+            for row in csv_reader:
+                
+                # Check if the column exists in the current row
+                if column_name in row:
+                    # Attempt to convert the value to a float and append to the list
+                    try:
+                        value = float(row[column_name])
+                        column_values.append(value)
+                    except ValueError:
+                        # If conversion fails, print a warning and skip the value
+                        print(f"Warning: Non-numeric data found in column '{column_name}' and row skipped.")
+
+            # Calculate the mean if there are valid values collected
+            if len(column_values) > 0:
+                mean_value = sum(column_values) / len(column_values)
+                return mean_value
+            else:
+                return "No valid numeric data found in the specified column."
+
+    except FileNotFoundError:
+        # Handle the case where the file path is incorrect
+        return "Error: The file was not found. Please check the file path."
+    except Exception as e:
+        # Handle any other unexpected exceptions
+        return f"An error occurred: {str(e)}"
+
+# Example usage (uncomment to run):
+# result = calculate_column_mean('example.csv', 'column_name')
+# print(f"The mean of the column is: {result}")
